@@ -9,6 +9,28 @@ export const config = {
     }
 };
 
+// 🔥 SAFE JSON EXTRACTOR (fixes your error)
+function extractJSON(text) {
+    if (!text) return null;
+
+    // remove markdown garbage
+    const cleaned = text
+        .replace(/```json/g, "")
+        .replace(/```/g, "")
+        .trim();
+
+    // extract first JSON object
+    const match = cleaned.match(/\{[\s\S]*\}/);
+    if (!match) return null;
+
+    try {
+        return JSON.parse(match[0]);
+    } catch (err) {
+        console.error("JSON parse failed:", err.message);
+        return null;
+    }
+}
+
 export default async function handler(req, res) {
 
     if (req.method !== "POST") {
@@ -30,14 +52,12 @@ export default async function handler(req, res) {
         const ai = new GoogleGenAI({ apiKey });
 
         const [fields, files] = await new Promise((resolve, reject) => {
-
             const form = formidable({ multiples: false });
 
             form.parse(req, (err, fields, files) => {
                 if (err) reject(err);
                 else resolve([fields, files]);
             });
-
         });
 
         const mode = fields.mode?.[0];
@@ -60,17 +80,17 @@ export default async function handler(req, res) {
         // =========================
         if (mimeType.startsWith("image/")) {
 
-            const prompt = mode === "chat"
-                ? "Answer questions about this image."
-                : "Analyze this image and summarize it.";
-
             const response = await ai.models.generateContent({
                 model: "gemini-2.5-flash",
                 contents: [
                     {
                         role: "user",
                         parts: [
-                            { text: prompt },
+                            {
+                                text: mode === "chat"
+                                    ? "Answer questions about this image."
+                                    : "Analyze this image and return ONLY JSON."
+                            },
                             {
                                 inlineData: {
                                     mimeType,
@@ -83,7 +103,6 @@ export default async function handler(req, res) {
             });
 
             extractedText = response.text || "";
-
         }
 
         // =========================
@@ -101,7 +120,7 @@ export default async function handler(req, res) {
         }
 
         // =========================
-        // FINAL PROMPT
+        // PROMPT
         // =========================
         let prompt;
 
@@ -112,9 +131,6 @@ You are an AI assistant.
 
 Answer ONLY using the content below.
 
-If answer is not present, say:
-"I couldn't find that information in the uploaded document."
-
 CONTENT:
 ${extractedText}
 `;
@@ -122,10 +138,11 @@ ${extractedText}
         } else {
 
             prompt = `
-Analyze the following content.
+Return ONLY valid JSON.
 
-Return ONLY valid JSON:
+Do NOT use markdown or code blocks.
 
+Format:
 {
   "summary": "3-5 sentence summary",
   "category": "Research",
@@ -146,16 +163,34 @@ ${extractedText}
             contents: prompt
         });
 
-        const result = response.text;
+        const resultText = response.text;
 
-        if (!result) {
+        if (!resultText) {
             return res.status(500).json({
-                error: "Gemini returned an empty response."
+                error: "Gemini returned empty response."
             });
         }
 
+        // =========================
+        // SAFE JSON PARSE
+        // =========================
+        let finalResult = resultText;
+
+        if (mode !== "chat") {
+            const parsed = extractJSON(resultText);
+
+            if (!parsed) {
+                return res.status(500).json({
+                    error: "Failed to parse AI JSON response",
+                    raw: resultText
+                });
+            }
+
+            finalResult = parsed;
+        }
+
         return res.status(200).json({
-            summary: result,
+            result: finalResult,
             text: extractedText
         });
 
