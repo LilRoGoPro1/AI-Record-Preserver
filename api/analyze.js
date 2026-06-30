@@ -88,23 +88,48 @@ Analyze the following document.
 
 Return ONLY valid JSON.
 
-Do not use markdown.
-Do not use code blocks.
-Do not explain anything.
+Do NOT use markdown.
+Do NOT use code blocks.
+Do NOT explain anything.
 
-Return exactly:
+Choose ONE category ONLY from this list:
+
+Biography
+History
+Science
+Research
+Technology
+Business
+Finance
+Medicine
+Education
+Legal
+Literature
+Government
+Personal
+Resume
+News
+Other
+
+Choose ONE sentiment ONLY from:
+
+Positive
+Neutral
+Negative
+
+Return exactly this JSON format:
 
 {
-  "summary": "3-5 sentence summary",
-  "category": "Research",
-  "keywords": [
+  "summary":"3-5 sentence summary",
+  "category":"One category from the list above",
+  "keywords":[
     "keyword1",
     "keyword2",
     "keyword3",
     "keyword4",
     "keyword5"
   ],
-  "sentiment": "Positive"
+  "sentiment":"Positive, Neutral or Negative"
 }
 
 Document:
