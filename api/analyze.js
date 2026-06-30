@@ -59,11 +59,13 @@ if(!isImage){
 
 }
 
-        if (!text || text.trim() === "") {
-            return res.status(400).json({
-                error: "Could not extract text from the uploaded file."
-            });
-        }
+        if (!isImage && (!text || text.trim() === "")) {
+
+    return res.status(400).json({
+        error: "Could not extract text from the uploaded file."
+    });
+
+}
 
         const apiKey = process.env.GEMINI_API_KEY;
 
@@ -120,6 +122,11 @@ Resume
 News
 Photo
 Artwork
+Document
+Screenshot
+Chart
+Diagram
+Map
 Other
 
 Choose ONE sentiment ONLY from:
@@ -203,8 +210,6 @@ ${text}
   }
 
 }
-
-        }
 
         const ai = new GoogleGenAI({
             apiKey
