@@ -331,17 +331,18 @@ DASHBOARD LAYOUT
 =========================================== */
 
 .dashboard{
-max-width:1600px;
+
+max-width:1900px;
 
 margin:auto;
 
-padding:30px 60px 80px;
+padding:30px 40px 80px;
 
 display:grid;
 
-grid-template-columns:320px 1fr 400px;
+grid-template-columns:300px 2fr 350px;
 
-gap:30px;
+gap:35px;
 
 align-items:start;
 
@@ -623,13 +624,11 @@ RECORD LIST
 
 #recordList{
 
-display:grid;
+display:flex;
 
-grid-template-columns:
+flex-direction:column;
 
-repeat(auto-fill,minmax(300px,1fr));
-
-gap:22px;
+gap:25px;
 
 }
 
@@ -641,15 +640,17 @@ border:1px solid rgba(255,255,255,.06);
 
 border-radius:22px;
 
-padding:22px;
+padding:30px;
 
 display:flex;
 
 flex-direction:column;
 
-gap:14px;
+gap:18px;
 
 transition:.35s;
+
+width:100%;
 
 }
 
@@ -699,7 +700,7 @@ AI CHAT
 
 #chatMessages{
 
-height:450px;
+height:700px;
 
 overflow-y:auto;
 
