@@ -22,6 +22,8 @@ document.getElementById("uploadBtn").addEventListener("click", uploadRecord);
 
 document.getElementById("searchBtn").addEventListener("click", searchRecords);
 
+document.getElementById("searchInput").addEventListener("input", searchRecords);
+
 document.getElementById("sendChat").addEventListener("click", sendMessage);
 
 // Browse button
