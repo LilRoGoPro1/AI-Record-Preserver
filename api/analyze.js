@@ -48,7 +48,16 @@ export default async function handler(req, res) {
 
         uploadedFile.buffer = fs.readFileSync(uploadedFile.filepath);
 
-        const text = await extractText(uploadedFile);
+        let text = "";
+
+const isImage =
+uploadedFile.mimetype.startsWith("image/");
+
+if(!isImage){
+
+    text = await extractText(uploadedFile);
+
+}
 
         if (!text || text.trim() === "") {
             return res.status(400).json({
@@ -68,7 +77,7 @@ export default async function handler(req, res) {
 
         if (mode === "chat") {
 
-            prompt = `
+    prompt = `
 You are an AI assistant.
 
 Answer ONLY using the document below.
@@ -81,9 +90,63 @@ Document:
 ${text}
 `;
 
-        } else {
+} else {
 
-            prompt = `
+    if (isImage) {
+
+        prompt = `
+Analyze this image.
+
+Do NOT use markdown.
+Do NOT use code blocks.
+Do NOT explain anything.
+
+Choose ONE category ONLY from this list:
+
+Biography
+History
+Science
+Research
+Technology
+Business
+Finance
+Medicine
+Education
+Legal
+Literature
+Government
+Personal
+Resume
+News
+Photo
+Artwork
+Other
+
+Choose ONE sentiment ONLY from:
+
+Positive
+Neutral
+Negative
+
+Return exactly this JSON format:
+
+{
+  "summary":"Describe exactly what is happening in the image in 3-5 sentences.",
+  "category":"One category from the list above",
+  "keywords":[
+    "keyword1",
+    "keyword2",
+    "keyword3",
+    "keyword4",
+    "keyword5"
+  ],
+  "sentiment":"Positive, Neutral or Negative"
+}
+`;
+
+    } else {
+
+        prompt = `
 Analyze the following document.
 
 Return ONLY valid JSON.
@@ -137,25 +200,59 @@ Document:
 ${text}
 `;
 
+  }
+
+}
+
         }
 
         const ai = new GoogleGenAI({
             apiKey
         });
 
-        const response = await ai.models.generateContent({
-            model: "gemini-2.5-flash",
-            contents: [
+        let contents;
+
+if (isImage) {
+
+    contents = [
+        {
+            role: "user",
+            parts: [
                 {
-                    role: "user",
-                    parts: [
-                        {
-                            text: prompt
-                        }
-                    ]
+                    text: prompt
+                },
+                {
+                    inlineData: {
+                        mimeType: uploadedFile.mimetype,
+                        data: uploadedFile.buffer.toString("base64")
+                    }
                 }
             ]
-        });
+        }
+    ];
+
+} else {
+
+    contents = [
+        {
+            role: "user",
+            parts: [
+                {
+                    text: prompt
+                }
+            ]
+        }
+    ];
+
+}
+
+const response = await ai.models.generateContent({
+
+    model: "gemini-2.5-flash",
+
+    contents
+
+});
 
         const result = response.candidates?.[0]?.content?.parts?.[0]?.text;
 
