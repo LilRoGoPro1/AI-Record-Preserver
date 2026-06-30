@@ -81,6 +81,18 @@ export async function extractText(file) {
         return text;
     }
 
-    throw new Error("Unsupported file type.");
+    // Images are analyzed directly by Gemini.
+// No text extraction is needed.
+
+if (
+    extension === "png" ||
+    extension === "jpg" ||
+    extension === "jpeg" ||
+    extension === "webp"
+) {
+    return "";
+}
+
+throw new Error("Unsupported file type.");
 
 }
