@@ -186,121 +186,81 @@ function saveRecords() {
 
 function displayRecords(list = records){
 
-
-
     const container = document.getElementById("recordList");
-
-
 
     container.innerHTML = "";
 
-
-
     if(list.length === 0){
-
-
 
         container.innerHTML = "<p>No Records Found.</p>";
 
-
-
         return;
-
-
 
     }
 
-
-
     list.forEach(function(record){
-
-
 
         const card = document.createElement("div");
 
-
-
         card.className = "record-card";
-
-
 
         card.innerHTML = `
 
-<div class="record-header">
+            <div class="record-header">
 
-    <div class="record-icon">
+                <div class="record-icon">📄</div>
 
-        📄
+                <div>
 
-    </div>
+                    <h3>${record.title}</h3>
 
-    <div>
+                    <small>${record.uploadDate}</small>
 
-        <h3>${record.title}</h3>
+                </div>
 
-        <small>${record.uploadDate}</small>
+            </div>
 
-    </div>
+            <div class="record-badges">
 
-</div>
+                <span class="badge category">${record.category}</span>
 
-<div class="record-badges">
+                <span class="badge sentiment">${record.sentiment}</span>
 
-    <span class="badge category">
+            </div>
 
-        ${record.category}
+            <div class="record-summary">
 
-    </span>
+                ${record.summary}
 
-    <span class="badge sentiment">
+            </div>
 
-        ${record.sentiment}
+            <div class="keyword-container">
 
-    </span>
+                ${record.keywords.map(k => `<span class="keyword">${k}</span>`).join("")}
 
-</div>
+            </div>
 
-<p class="record-summary">
+            <div class="record-actions">
 
-${record.summary}
+                <button class="view-btn" onclick="viewRecord(${record.id})">
 
-</p>
+                    View Details
 
-<div class="keyword-container">
+                </button>
 
-${record.keywords.map(keyword => `
-<span class="keyword">${keyword}</span>
-`).join("")}
+                <button class="delete-btn" onclick="deleteRecord(${record.id})">
 
-</div>
+                    Delete
 
-<div class="record-actions">
+                </button>
 
-<button class="view-btn">
+            </div>
 
-View Details
-
-</button>
-
-<button class="delete-btn" onclick="deleteRecord(${record.id})">
-
-Delete
-
-</button>
-
-</div>
-
-`;
-
-
+        `;
 
         container.appendChild(card);
 
-
-
     });
-
-
 
 }
 
@@ -689,3 +649,99 @@ function hideAIProcessing(){
 document.getElementById("aiOverlay").style.display="none";
 
 }
+
+// ===============================
+// VIEW RECORD
+// ===============================
+
+function viewRecord(id){
+
+    const record = records.find(r => r.id === id);
+
+    if(!record) return;
+
+    document.getElementById("modalTitle").textContent = record.title;
+
+    document.getElementById("modalContent").innerHTML = `
+
+        <div class="modal-section">
+
+            <h3>Summary</h3>
+
+            <div class="modal-text">${record.summary}</div>
+
+        </div>
+
+        <div class="modal-section">
+
+            <h3>Full Document</h3>
+
+            <div class="modal-text">${record.content || "No extracted text."}</div>
+
+        </div>
+
+        <div class="modal-section">
+
+            <h3>Category</h3>
+
+            <div class="modal-text">${record.category}</div>
+
+        </div>
+
+        <div class="modal-section">
+
+            <h3>Sentiment</h3>
+
+            <div class="modal-text">${record.sentiment}</div>
+
+        </div>
+
+        <div class="modal-section">
+
+            <h3>Keywords</h3>
+
+            <div class="modal-text">${record.keywords.join(", ")}</div>
+
+        </div>
+
+        <div class="modal-section">
+
+            <h3>File Information</h3>
+
+            <div class="modal-text">
+
+                File: ${record.fileName}<br>
+
+                Type: ${record.fileType}<br>
+
+                Size: ${record.fileSize}<br>
+
+                Uploaded: ${record.uploadDate}
+
+            </div>
+
+        </div>
+
+    `;
+
+    document.getElementById("recordModal").style.display = "flex";
+
+}
+
+document.getElementById("closeModal").onclick = function(){
+
+    document.getElementById("recordModal").style.display = "none";
+
+};
+
+window.onclick = function(event){
+
+    const modal = document.getElementById("recordModal");
+
+    if(event.target === modal){
+
+        modal.style.display = "none";
+
+    }
+
+};
