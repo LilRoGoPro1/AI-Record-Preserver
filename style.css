@@ -1385,3 +1385,215 @@ letter-spacing:1px;
 text-align:center;
 
 }
+
+/* ===========================
+   MODERN RECORD CARDS
+=========================== */
+
+.record-card{
+
+    background:rgba(255,255,255,.04);
+
+    border:1px solid rgba(255,255,255,.08);
+
+    border-radius:18px;
+
+    padding:22px;
+
+    margin-bottom:18px;
+
+    transition:.35s;
+
+    backdrop-filter:blur(14px);
+
+}
+
+.record-card:hover{
+
+    transform:translateY(-4px);
+
+    border-color:#5b7cff;
+
+    box-shadow:0 15px 35px rgba(91,124,255,.25);
+
+}
+
+.record-header{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:15px;
+
+    margin-bottom:15px;
+
+}
+
+.record-icon{
+
+    width:55px;
+
+    height:55px;
+
+    border-radius:14px;
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+    font-size:28px;
+
+    background:linear-gradient(135deg,#5b7cff,#8f6fff);
+
+}
+
+.record-header h3{
+
+    margin:0;
+
+    font-size:20px;
+
+}
+
+.record-header small{
+
+    color:#9ea8c8;
+
+}
+
+.record-badges{
+
+    display:flex;
+
+    gap:10px;
+
+    margin-bottom:18px;
+
+    flex-wrap:wrap;
+
+}
+
+.badge{
+
+    padding:7px 14px;
+
+    border-radius:999px;
+
+    font-size:12px;
+
+    font-weight:700;
+
+}
+
+.category{
+
+    background:#335dff33;
+
+    color:#8fb1ff;
+
+}
+
+.sentiment{
+
+    background:#00d08433;
+
+    color:#7dffbd;
+
+}
+
+.record-summary{
+
+    color:#d7dff7;
+
+    line-height:1.7;
+
+    margin-bottom:18px;
+
+}
+
+.keyword-container{
+
+    display:flex;
+
+    flex-wrap:wrap;
+
+    gap:8px;
+
+    margin-bottom:20px;
+
+}
+
+.keyword{
+
+    background:rgba(255,255,255,.08);
+
+    color:white;
+
+    padding:7px 12px;
+
+    border-radius:50px;
+
+    font-size:12px;
+
+}
+
+.record-actions{
+
+    display:flex;
+
+    justify-content:flex-end;
+
+    gap:12px;
+
+}
+
+.view-btn{
+
+    background:#5b7cff;
+
+    border:none;
+
+    color:white;
+
+    padding:10px 18px;
+
+    border-radius:10px;
+
+    cursor:pointer;
+
+    transition:.3s;
+
+}
+
+.view-btn:hover{
+
+    background:#7693ff;
+
+}
+
+.delete-btn{
+
+    background:#ff4b6b;
+
+    border:none;
+
+    color:white;
+
+    padding:10px 18px;
+
+    border-radius:10px;
+
+    cursor:pointer;
+
+    transition:.3s;
+
+}
+
+.delete-btn:hover{
+
+    background:#ff6b87;
+
+}
