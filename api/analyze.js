@@ -97,13 +97,33 @@ ${text}
     if (isImage) {
 
         prompt = `
-Analyze this image.
+Analyze this image carefully.
 
-Do NOT use markdown.
-Do NOT use code blocks.
-Do NOT explain anything.
+Your job is to understand EVERYTHING visible in the image.
 
-Choose ONE category ONLY from this list:
+If you recognize any famous person, identify them if you are confident.
+
+If you recognize any landmark, monument, building, logo, artwork, country flag, book cover, movie poster, celebrity, vehicle, animal, food, or object, identify it.
+
+Read every visible piece of text.
+
+Explain what is happening.
+
+Describe the environment.
+
+Describe people's expressions and actions.
+
+If the image contains a graph or chart, explain it.
+
+If it contains handwriting, read it.
+
+If it contains a screenshot, explain what application or website it appears to be.
+
+Never guess.
+
+If uncertain, clearly state you are unsure.
+
+Choose ONE category from:
 
 Biography
 History
@@ -122,30 +142,39 @@ Resume
 News
 Photo
 Artwork
-Document
+Landmark
 Screenshot
-Chart
-Diagram
+Document
+Animal
+Vehicle
+Food
+Nature
 Map
+Chart
 Other
 
-Choose ONE sentiment ONLY from:
+Choose ONE sentiment:
 
 Positive
 Neutral
 Negative
 
-Return exactly this JSON format:
+Return ONLY valid JSON:
 
 {
-  "summary":"Describe exactly what is happening in the image in 3-5 sentences.",
-  "category":"One category from the list above",
+  "summary":"A detailed description of everything important visible in the image.",
+  "category":"Best matching category",
   "keywords":[
     "keyword1",
     "keyword2",
     "keyword3",
     "keyword4",
-    "keyword5"
+    "keyword5",
+    "keyword6",
+    "keyword7",
+    "keyword8",
+    "keyword9",
+    "keyword10"
   ],
   "sentiment":"Positive, Neutral or Negative"
 }
