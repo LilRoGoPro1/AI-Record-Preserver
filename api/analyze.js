@@ -2,7 +2,6 @@ import formidable from "formidable";
 import fs from "fs";
 import { extractText } from "./extract.js";
 import { GoogleGenAI } from "@google/genai";
-import cloudinary from "./cloudinary.js";
 
 export const config = {
     api: {
@@ -53,17 +52,6 @@ export default async function handler(req, res) {
 const isImage = uploadedFile.mimetype.startsWith("image/");
 const isAudio = uploadedFile.mimetype.startsWith("audio/");
 const isVideo = uploadedFile.mimetype.startsWith("video/");
-
-if (isImage || isAudio || isVideo) {
-
-    uploadedMedia = await cloudinary.uploader.upload(
-        uploadedFile.filepath,
-        {
-            resource_type: "auto"
-        }
-    );
-
-}
 
         let text = "";
 
