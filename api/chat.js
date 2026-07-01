@@ -124,8 +124,8 @@ Answer:
 
         const response = await ai.models.generateContent({
 
-            model: "gemini-2.5-pro",
-
+            model: "gemini-2.5-flash"
+            
             config: {
                 temperature: 0.5,
                 topP: 0.9,
