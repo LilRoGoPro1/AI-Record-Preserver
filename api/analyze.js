@@ -47,11 +47,28 @@ export default async function handler(req, res) {
         }
 
         uploadedFile.buffer = fs.readFileSync(uploadedFile.filepath);
-        let uploadedMedia = null;
+        const ai = new GoogleGenAI({
+    apiKey: process.env.GEMINI_API_KEY
+});
+
+let uploadedMedia = null;
 
 const isImage = uploadedFile.mimetype.startsWith("image/");
 const isAudio = uploadedFile.mimetype.startsWith("audio/");
 const isVideo = uploadedFile.mimetype.startsWith("video/");
+
+if (isImage || isAudio || isVideo) {
+
+    uploadedMedia = await ai.files.upload({
+    file: uploadedFile.filepath,
+    config: {
+        mimeType: uploadedFile.mimetype
+    }
+});
+
+console.log(uploadedMedia);
+
+}
 
         let text = "";
 
@@ -67,14 +84,6 @@ if (!isImage && !isAudio && !isVideo) {
     });
 
 }
-
-        const apiKey = process.env.GEMINI_API_KEY;
-
-        if (!apiKey) {
-            return res.status(500).json({
-                error: "GEMINI_API_KEY is missing."
-            });
-        }
 
         let prompt = "";
 
@@ -452,10 +461,6 @@ ${text}
 
 }
 
-        const ai = new GoogleGenAI({
-            apiKey
-        });
-
         let contents;
 
 if (isImage || isAudio || isVideo) {
@@ -467,12 +472,7 @@ if (isImage || isAudio || isVideo) {
             {
                 text: prompt
             },
-            {
-                fileData: {
-                    mimeType: uploadedFile.mimetype,
-                    fileUri: uploadedMedia.secure_url
-                }
-            }
+           uploadedMedia
         ]
     }
 ];
