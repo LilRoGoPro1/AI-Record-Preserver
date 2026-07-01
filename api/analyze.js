@@ -469,11 +469,22 @@ if (isImage || isAudio || isVideo) {
     {
         role: "user",
         parts: [
-            {
-                text: prompt
-            },
-           uploadedMedia
-        ]
+
+{ text: prompt },
+
+{
+
+fileData: {
+
+mimeType: uploadedMedia.mimeType,
+
+fileUri: uploadedMedia.uri
+
+}
+
+}
+
+]
     }
 ];
 
