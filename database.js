@@ -55,15 +55,17 @@ function loadRecords() {
 
     const request = store.getAll();
 
-    request.onsuccess = function() {
+    request.onsuccess = function () {
 
-        records = request.result;
+    records = request.result;
 
-        displayRecords();
+    displayRecords();
 
-        console.log("Records Loaded!");
+    updateStatistics();
 
-    };
+    console.log("Records Loaded!");
+
+};
 
 }
 
