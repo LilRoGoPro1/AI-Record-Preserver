@@ -500,9 +500,10 @@ if (chatHistory.length > 20) {
 
     document.querySelector("#chatMessages .message:last-child").remove();
 
-    addMessage("AI", "Sorry, I couldn't answer that.");
-
-}
+    addMessage(
+    "AI",
+    "Something went wrong while contacting the AI. Please try again."
+);
 
 }
 
