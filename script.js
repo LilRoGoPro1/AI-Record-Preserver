@@ -559,14 +559,21 @@ async function analyzeWithAI(file) {
 ];
 
     const response = await fetch("/api/analyze", {
+    method: "POST",
+    body: formData
+});
 
-        method: "POST",
+const raw = await response.text();
 
-        body: formData
+console.log("RAW RESPONSE:", raw);
 
-    });
+let data;
 
-    const data = await response.json();
+try {
+    data = JSON.parse(raw);
+} catch {
+    throw new Error(raw);
+}
 
     if (!response.ok) {
 
