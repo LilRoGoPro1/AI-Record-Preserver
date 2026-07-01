@@ -48,12 +48,24 @@ export default async function handler(req, res) {
         }
 
         uploadedFile.buffer = fs.readFileSync(uploadedFile.filepath);
-
-        let text = "";
+        let uploadedMedia = null;
 
 const isImage = uploadedFile.mimetype.startsWith("image/");
 const isAudio = uploadedFile.mimetype.startsWith("audio/");
 const isVideo = uploadedFile.mimetype.startsWith("video/");
+
+if (isImage || isAudio || isVideo) {
+
+    uploadedMedia = await cloudinary.uploader.upload(
+        uploadedFile.filepath,
+        {
+            resource_type: "auto"
+        }
+    );
+
+}
+
+        let text = "";
 
 if (!isImage && !isAudio && !isVideo) {
     text = await extractText(uploadedFile);
@@ -461,21 +473,21 @@ ${text}
 if (isImage || isAudio || isVideo) {
 
     contents = [
-        {
-            role: "user",
-            parts: [
-                {
-                    text: prompt
-                },
-                {
-                    inlineData: {
-                        mimeType: uploadedFile.mimetype,
-                        data: uploadedFile.buffer.toString("base64")
-                    }
+    {
+        role: "user",
+        parts: [
+            {
+                text: prompt
+            },
+            {
+                fileData: {
+                    mimeType: uploadedFile.mimetype,
+                    fileUri: uploadedMedia.secure_url
                 }
-            ]
-        }
-    ];
+            }
+        ]
+    }
+];
 
 } else {
 
