@@ -2,6 +2,7 @@ import formidable from "formidable";
 import fs from "fs";
 import { extractText } from "./extract.js";
 import { GoogleGenAI } from "@google/genai";
+import cloudinary from "./cloudinary.js";
 
 export const config = {
     api: {
