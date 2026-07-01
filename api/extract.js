@@ -85,11 +85,25 @@ export async function extractText(file) {
 // No text extraction is needed.
 
 if (
-    extension === "png" ||
-    extension === "jpg" ||
-    extension === "jpeg" ||
-    extension === "webp"
-) {
+
+extension==="png" ||
+extension==="jpg" ||
+extension==="jpeg" ||
+extension==="webp" ||
+
+extension==="mp3" ||
+extension==="wav" ||
+extension==="ogg" ||
+extension==="m4a" ||
+
+extension==="mp4" ||
+extension==="mov" ||
+extension==="avi" ||
+extension==="webm" ||
+
+extension==="mkv"
+
+){
     return "";
 }
 
