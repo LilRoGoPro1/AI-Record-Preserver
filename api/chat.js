@@ -10,7 +10,7 @@ export default async function handler(req, res) {
 
     try {
 
-        const { text } = req.body;
+        const { documents, question } = req.body;
 
         const apiKey = process.env.GEMINI_API_KEY;
 
@@ -21,6 +21,14 @@ export default async function handler(req, res) {
         const response = await ai.models.generateContent({
 
     model: "gemini-2.5-flash",
+
+            config: {
+
+    temperature: 0.3,
+
+    maxOutputTokens: 1500
+
+},
 
     contents: [
         {
@@ -41,9 +49,15 @@ Rules:
 - If the answer is partially available, answer with what you know.
 - Only say "I couldn't find that information in your uploaded documents." if the information truly does not exist.
 
-Documents:
+Uploaded Documents:
 
-${text}
+${documents}
+
+User Question:
+
+${question}
+
+Answer:
 `
                 }
             ]
@@ -51,7 +65,6 @@ ${text}
     ]
 
 });
-        });
 
         const result =
             response.candidates?.[0]?.content?.parts?.[0]?.text;
