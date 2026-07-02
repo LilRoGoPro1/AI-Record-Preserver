@@ -1,374 +1,74 @@
-// -----------------------------
-// Horizontal Drag Engine
-// -----------------------------
+    // 1. Drag-to-Scroll & Parallax/Fade Engine
+    const slider = document.getElementById('dragContainer');
+    const panels = document.querySelectorAll('.intro-panel');
+    let isDown = false;
+    let startX, scrollLeft;
 
-const slider = document.getElementById("dragContainer");
-const panels = document.querySelectorAll(".intro-panel");
+    slider.addEventListener('mousedown', (e) => {
+        isDown = true;
+        startX = e.pageX - slider.offsetLeft;
+        scrollLeft = slider.scrollLeft;
+    });
 
-let isDown = false;
-let startX = 0;
-let scrollLeft = 0;
-let targetScroll = 0;
+    slider.addEventListener('mouseleave', () => isDown = false);
+    slider.addEventListener('mouseup', () => isDown = false);
 
-slider.addEventListener("mousedown", e => {
+    slider.addEventListener('mousemove', (e) => {
+        if (!isDown) return;
+        e.preventDefault();
+        const x = e.pageX - slider.offsetLeft;
+        const walk = (x - startX) * 2;
+        slider.scrollLeft = scrollLeft - walk;
+    });
 
-    isDown = true;
+    slider.addEventListener('scroll', () => {
+        const scrollPos = slider.scrollLeft;
+        
+        panels.forEach((panel) => {
+            const rect = panel.getBoundingClientRect();
+            const center = window.innerWidth / 2;
+            const panelCenter = rect.left + rect.width / 2;
+            
+            // Interactive Text: Move slightly on scroll
+            const move = (center - panelCenter) * 0.1;
+            panel.style.transform = `translateX(${move}px)`;
+            
+            // Interactive Text: Fade out at edges
+            const distFromCenter = Math.abs(center - panelCenter);
+            panel.style.opacity = Math.max(0.2, 1 - distFromCenter / 500);
+        });
 
-    slider.style.cursor = "grabbing";
+        // Sync 3D background rotation with scroll
+        particles.rotation.y = scrollPos * 0.001;
+    });
 
-    startX = e.pageX;
+    // 2. 3D Background Engine
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+    const renderer = new THREE.WebGLRenderer({ canvas: document.querySelector('#bgCanvas'), antialias: true });
 
-    scrollLeft = slider.scrollLeft;
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    camera.position.z = 30;
 
-});
+    const geometry = new THREE.BufferGeometry();
+    const count = 5000;
+    const positions = new Float32Array(count * 3);
+    for (let i = 0; i < count * 3; i++) positions[i] = (Math.random() - 0.5) * 100;
+    geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
 
-window.addEventListener("mouseup", () => {
+    const material = new THREE.PointsMaterial({ size: 0.05, color: 0xffffff });
+    const particles = new THREE.Points(geometry, material);
+    scene.add(particles);
 
-    isDown = false;
-
-    slider.style.cursor = "grab";
-
-});
-
-window.addEventListener("mousemove", e => {
-
-    if (!isDown) return;
-
-    e.preventDefault();
-
-    const walk = (e.pageX - startX) * 2.5;
-
-    slider.scrollLeft = scrollLeft - walk;
-
-    targetScroll = slider.scrollLeft;
-
-});
-
-slider.addEventListener("wheel", e => {
-
-    e.preventDefault();
-
-    targetScroll += e.deltaY * 3;
-
-},{passive:false});
-
-
-
-// -----------------------------
-// Three.js Background
-// -----------------------------
-
-const scene = new THREE.Scene();
-
-const camera = new THREE.PerspectiveCamera(
-
-70,
-
-window.innerWidth/window.innerHeight,
-
-0.1,
-
-1000
-
-);
-
-camera.position.z = 30;
-
-const renderer = new THREE.WebGLRenderer({
-
-    canvas: document.getElementById("bgCanvas"),
-
-    antialias: true,
-
-    alpha: true
-
-});
-
-renderer.setSize(window.innerWidth, window.innerHeight);
-
-renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
-
-// ------------------------------------
-// Hidden canvas for VAELOS particles
-// ------------------------------------
-
-const textCanvas = document.createElement("canvas");
-const textCtx = textCanvas.getContext("2d");
-
-textCanvas.width = 1400;
-textCanvas.height = 500;
-
-textCtx.fillStyle = "white";
-textCtx.textAlign = "center";
-textCtx.textBaseline = "middle";
-
-textCtx.font = "900 220px Syne";
-
-textCtx.fillText(
-    "VAELOS",
-    textCanvas.width / 2,
-    textCanvas.height / 2
-);
-
-const imageData = textCtx.getImageData(
-    0,
-    0,
-    textCanvas.width,
-    textCanvas.height
-).data;
-
-const vertices = [];
-const targets = [];
-
-for (let y = 0; y < textCanvas.height; y += 10) {
-
-    for (let x = 0; x < textCanvas.width; x += 10) {
-
-        const index = (y * textCanvas.width + x) * 4;
-
-        if (imageData[index + 3] > 150) {
-
-            vertices.push(
-                (Math.random() - 0.5) * 150,
-                (Math.random() - 0.5) * 150,
-                (Math.random() - 0.5) * 150
-            );
-
-            targets.push(
-                (x - textCanvas.width / 2) * 0.04,
-                -(y - textCanvas.height / 2) * 0.04,
-                0
-            );
-
-        }
-
+    function animate() {
+        requestAnimationFrame(animate);
+        particles.rotation.y += 0.0005;
+        renderer.render(scene, camera);
     }
-
-}
-
-const geometry = new THREE.BufferGeometry();
-
-geometry.setAttribute(
-    "position",
-    new THREE.Float32BufferAttribute(vertices, 3)
-);
-
-const targetPositions = targets;
-
-const material = new THREE.PointsMaterial({
-
-color:0x8fe7ff,
-
-size:0.06,
-
-transparent:true,
-
-opacity:1,
-
-depthWrite:false,
-
-blending:THREE.AdditiveBlending
-
-});
-
-const particles = new THREE.Points(
-
-geometry,
-
-material
-
-);
-
-scene.add(particles);
-
-// -----------------------------
-// Particle Explosion Intro
-// -----------------------------
-
-let introProgress = 0;
-
-const originalPositions = geometry.attributes.position.array.slice();
-
-for(let i=0;i<originalPositions.length;i+=3){
-
-    geometry.attributes.position.array[i]=0;
-
-    geometry.attributes.position.array[i+1]=0;
-
-    geometry.attributes.position.array[i+2]=0;
-
-}
-
-geometry.attributes.position.needsUpdate=true;
-
-
-
-// -----------------------------
-// Mouse Reaction
-// -----------------------------
-
-let mouseX = 0;
-let mouseY = 0;
-let cameraTargetX = 0;
-let cameraTargetY = 0;
-
-window.addEventListener("mousemove",(e)=>{
-
-mouseX=(e.clientX/window.innerWidth-.5)*2;
-
-mouseY=(e.clientY/window.innerHeight-.5)*2;
-
-cameraTargetX=mouseX*2.5;
-
-cameraTargetY=-mouseY*2;
-
-});
-
-
-
-// -----------------------------
-// Hero Animation
-// -----------------------------
-
-const hero = document.querySelector(".hero-title");
-
-hero.style.opacity = "0";
-hero.style.transform = "translateY(120px) scale(.75)";
-hero.style.filter = "blur(25px)";
-
-setTimeout(()=>{
-
-hero.style.transition=`
-opacity 1.4s ease,
-transform 1.6s cubic-bezier(.2,.9,.2,1),
-filter 1.6s ease
-`;
-
-hero.style.opacity="1";
-
-hero.style.transform="translateY(0px) scale(1)";
-
-hero.style.filter="blur(0px)";
-
-},400);
-
-let heroTime=0;
-
-
-
-// -----------------------------
-// Main Loop
-// -----------------------------
-
-function animate(){
-
-requestAnimationFrame(animate);
-
-
-
-targetScroll += (slider.scrollLeft-targetScroll)*0;
-
-slider.scrollLeft += (targetScroll - slider.scrollLeft) * 0.8;
-
-// Intro Explosion
-
-if(introProgress < 1){
-
-introProgress += 0.02;
-
-const arr = geometry.attributes.position.array;
-
-for(let i=0;i<arr.length;i++){
-
-arr[i] += (originalPositions[i]-arr[i])*introProgress*0.04;
-
-}
-
-geometry.attributes.position.needsUpdate=true;
-
-}
-
-
-    camera.position.x += (cameraTargetX-camera.position.x)*0.03;
-
-camera.position.y += (cameraTargetY-camera.position.y)*0.03;
-
-camera.lookAt(scene.position);
-    
-particles.rotation.y += .0004;
-
-particles.rotation.x += (mouseY * 0.08 - particles.rotation.x) * 0.015;
-
-particles.rotation.y += (mouseX * 0.08 - particles.rotation.y) * 0.015;
-
-
-
-panels.forEach(panel=>{
-
-const rect = panel.getBoundingClientRect();
-
-const center = window.innerWidth/2;
-
-const panelCenter = rect.left + rect.width/2;
-
-const distance = panelCenter-center;
-
-
-
-const move = distance*.06;
-
-const scale = 1-Math.abs(distance)/5000;
-
-const opacity = Math.max(.15,1-Math.abs(distance)/700);
-
-
-
-panel.style.transform = `translateX(${-move}px) scale(${scale})`;
-
-panel.style.opacity = opacity;
-
-});
-
-heroTime += 0.02;
-
-const floatY = Math.sin(heroTime) * 10;
-
-const glow = 25 + Math.sin(heroTime * 2) * 15;
-
-hero.style.transform = `
-translateY(${floatY}px)
-scale(1)
-`;
-
-hero.style.textShadow = `
-0 0 ${glow}px rgba(125,215,255,.35),
-0 0 ${glow*2}px rgba(125,215,255,.12)
-`;
-
-renderer.render(scene,camera);
-
-}
-
-animate();
-
-
-
-// -----------------------------
-
-window.addEventListener("resize",()=>{
-
-renderer.setSize(
-
-window.innerWidth,
-
-window.innerHeight
-
-);
-
-camera.aspect =
-
-window.innerWidth/window.innerHeight;
-
-camera.updateProjectionMatrix();
-
-});
+    animate();
+
+    window.addEventListener('resize', () => {
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        camera.aspect = window.innerWidth / window.innerHeight;
+        camera.updateProjectionMatrix();
+    });
