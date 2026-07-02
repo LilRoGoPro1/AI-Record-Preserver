@@ -145,18 +145,27 @@ mouseY = (e.clientY/window.innerHeight-.5)*2;
 
 const hero = document.querySelector(".hero-title");
 
-hero.style.opacity = 0;
-hero.style.transform = "translateY(80px) scale(.92)";
+hero.style.opacity = "0";
+hero.style.transform = "translateY(120px) scale(.75)";
+hero.style.filter = "blur(25px)";
 
 setTimeout(()=>{
 
-hero.style.transition = "1.5s cubic-bezier(.2,.9,.2,1)";
+hero.style.transition=`
+opacity 1.4s ease,
+transform 1.6s cubic-bezier(.2,.9,.2,1),
+filter 1.6s ease
+`;
 
-hero.style.opacity = 1;
+hero.style.opacity="1";
 
-hero.style.transform = "translateY(0px) scale(1)";
+hero.style.transform="translateY(0px) scale(1)";
+
+hero.style.filter="blur(0px)";
 
 },400);
+
+let heroTime=0;
 
 
 
@@ -210,7 +219,21 @@ panel.style.opacity = opacity;
 
 });
 
+heroTime += 0.02;
 
+const floatY = Math.sin(heroTime) * 10;
+
+const glow = 25 + Math.sin(heroTime * 2) * 15;
+
+hero.style.transform = `
+translateY(${floatY}px)
+scale(1)
+`;
+
+hero.style.textShadow = `
+0 0 ${glow}px rgba(125,215,255,.35),
+0 0 ${glow*2}px rgba(125,215,255,.12)
+`;
 
 renderer.render(scene,camera);
 
