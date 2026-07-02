@@ -14,21 +14,33 @@ slider.addEventListener("mousedown", e => {
 
     isDown = true;
 
+    slider.style.cursor = "grabbing";
+
     startX = e.pageX;
 
-    scrollLeft = targetScroll;
+    scrollLeft = slider.scrollLeft;
 
 });
 
-window.addEventListener("mouseup", () => isDown = false);
+window.addEventListener("mouseup", () => {
+
+    isDown = false;
+
+    slider.style.cursor = "grab";
+
+});
 
 window.addEventListener("mousemove", e => {
 
-    if(!isDown) return;
+    if (!isDown) return;
 
-    const walk = (e.pageX - startX) * 2;
+    e.preventDefault();
 
-    targetScroll = scrollLeft - walk;
+    const walk = (e.pageX - startX) * 2.5;
+
+    slider.scrollLeft = scrollLeft - walk;
+
+    targetScroll = slider.scrollLeft;
 
 });
 
@@ -36,7 +48,7 @@ slider.addEventListener("wheel", e => {
 
     e.preventDefault();
 
-    targetScroll += e.deltaY;
+    targetScroll += e.deltaY * 3;
 
 },{passive:false});
 
@@ -74,7 +86,7 @@ const renderer = new THREE.WebGLRenderer({
 
 renderer.setSize(window.innerWidth, window.innerHeight);
 
-renderer.setPixelRatio(window.devicePixelRatio);
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
 
 // ------------------------------------
 // Hidden canvas for VAELOS particles
@@ -108,9 +120,9 @@ const imageData = textCtx.getImageData(
 const vertices = [];
 const targets = [];
 
-for (let y = 0; y < textCanvas.height; y += 4) {
+for (let y = 0; y < textCanvas.height; y += 10) {
 
-    for (let x = 0; x < textCanvas.width; x += 4) {
+    for (let x = 0; x < textCanvas.width; x += 10) {
 
         const index = (y * textCanvas.width + x) * 4;
 
@@ -256,13 +268,13 @@ requestAnimationFrame(animate);
 
 targetScroll += (slider.scrollLeft-targetScroll)*0;
 
-slider.scrollLeft += (targetScroll - slider.scrollLeft) * 0.3;
+slider.scrollLeft += (targetScroll - slider.scrollLeft) * 0.8;
 
 // Intro Explosion
 
 if(introProgress < 1){
 
-introProgress += 0.008;
+introProgress += 0.02;
 
 const arr = geometry.attributes.position.array;
 
@@ -285,9 +297,9 @@ camera.lookAt(scene.position);
     
 particles.rotation.y += .0004;
 
-particles.rotation.x += (mouseY*.2-particles.rotation.x)*.02;
+particles.rotation.x += (mouseY * 0.08 - particles.rotation.x) * 0.015;
 
-particles.rotation.y += (mouseX*.2-particles.rotation.y)*.02;
+particles.rotation.y += (mouseX * 0.08 - particles.rotation.y) * 0.015;
 
 
 
