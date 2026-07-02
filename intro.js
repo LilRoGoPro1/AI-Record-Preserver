@@ -64,7 +64,19 @@ camera.position.z = 30;
 
 const renderer = new THREE.WebGLRenderer({
 
-    // ------------------------------------
+    canvas: document.getElementById("bgCanvas"),
+
+    antialias: true,
+
+    alpha: true
+
+});
+
+renderer.setSize(window.innerWidth, window.innerHeight);
+
+renderer.setPixelRatio(window.devicePixelRatio);
+
+// ------------------------------------
 // Hidden canvas for VAELOS particles
 // ------------------------------------
 
@@ -85,14 +97,6 @@ textCtx.fillText(
     textCanvas.width / 2,
     textCanvas.height / 2
 );
-
-canvas:document.getElementById("bgCanvas"),
-
-antialias:true,
-
-alpha:true
-
-});
 
 renderer.setSize(window.innerWidth,window.innerHeight);
 
