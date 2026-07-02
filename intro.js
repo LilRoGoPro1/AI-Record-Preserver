@@ -256,7 +256,7 @@ requestAnimationFrame(animate);
 
 targetScroll += (slider.scrollLeft-targetScroll)*0;
 
-slider.scrollLeft += (targetScroll-slider.scrollLeft)*.08;
+slider.scrollLeft += (targetScroll - slider.scrollLeft) * 0.3;
 
 // Intro Explosion
 
