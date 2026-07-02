@@ -1,282 +1,241 @@
-*{
-    margin:0;
-    padding:0;
-    box-sizing:border-box;
-}
+// -----------------------------
+// Horizontal Drag Engine
+// -----------------------------
 
-body{
-    overflow:hidden;
-    background:#000;
-    color:white;
-    font-family:'Syne',sans-serif;
-}
+const slider = document.getElementById("dragContainer");
+const panels = document.querySelectorAll(".intro-panel");
 
-#bgCanvas{
-    position:fixed;
-    inset:0;
-    width:100%;
-    height:100%;
-    z-index:-2;
-}
+let isDown = false;
+let startX = 0;
+let scrollLeft = 0;
+let targetScroll = 0;
 
-body::after{
-    content:"";
-    position:fixed;
-    inset:0;
-    background:
-    radial-gradient(circle at center,
-    rgba(110,190,255,.08),
-    transparent 60%);
-    pointer-events:none;
-    z-index:-1;
-}
+slider.addEventListener("mousedown", e => {
 
-.drag-container{
+    isDown = true;
 
-    display:flex;
-    align-items:center;
+    startX = e.pageX;
 
-    width:100vw;
-    height:100vh;
+    scrollLeft = targetScroll;
 
-    overflow-x:auto;
-    overflow-y:hidden;
+});
 
-    padding:0 180px;
+window.addEventListener("mouseup", () => isDown = false);
 
-    gap:260px;
+window.addEventListener("mousemove", e => {
 
-    cursor:grab;
+    if(!isDown) return;
 
-    scroll-behavior:smooth;
+    const walk = (e.pageX - startX) * 2;
 
-}
+    targetScroll = scrollLeft - walk;
 
-.drag-container:active{
+});
 
-    cursor:grabbing;
+slider.addEventListener("wheel", e => {
 
-}
+    e.preventDefault();
 
-.drag-container::-webkit-scrollbar{
+    targetScroll += e.deltaY;
 
-    height:10px;
+},{passive:false});
 
-}
 
-.drag-container::-webkit-scrollbar-track{
 
-    background:#050505;
+// -----------------------------
+// Three.js Background
+// -----------------------------
 
-}
+const scene = new THREE.Scene();
 
-.drag-container::-webkit-scrollbar-thumb{
+const camera = new THREE.PerspectiveCamera(
 
-    background:#333;
+70,
 
-    border-radius:20px;
+window.innerWidth/window.innerHeight,
 
-}
+0.1,
 
-.drag-container::-webkit-scrollbar-thumb:hover{
+1000
 
-    background:#666;
+);
 
-}
+camera.position.z = 30;
 
-.intro-panel{
+const renderer = new THREE.WebGLRenderer({
 
-    width:900px;
+canvas:document.getElementById("bgCanvas"),
 
-    flex-shrink:0;
+antialias:true,
 
-    transition:
-    transform .6s,
-    opacity .6s;
+alpha:true
+
+});
+
+renderer.setSize(window.innerWidth,window.innerHeight);
+
+renderer.setPixelRatio(window.devicePixelRatio);
+
+
+
+const geometry = new THREE.BufferGeometry();
+
+const count = 7000;
+
+const positions = new Float32Array(count*3);
+
+for(let i=0;i<count*3;i++){
+
+positions[i]=(Math.random()-0.5)*120;
 
 }
 
-.hero-panel{
+geometry.setAttribute(
 
-    max-width:900px;
+"position",
 
-}
+new THREE.BufferAttribute(positions,3)
 
-.brand-small{
+);
 
-    display:inline-block;
+const material = new THREE.PointsMaterial({
 
-    color:#7dd7ff;
+color:0xffffff,
 
-    letter-spacing:8px;
+size:0.05,
 
-    font-size:14px;
+transparent:true,
 
-    margin-bottom:35px;
+opacity:.9
 
-    font-weight:700;
+});
 
-    text-transform:uppercase;
+const particles = new THREE.Points(
 
-}
+geometry,
 
-.hero-title{
+material
 
-    font-size:200px;
+);
 
-    line-height:.82;
+scene.add(particles);
 
-    font-weight:800;
 
-    letter-spacing:-12px;
 
-    margin-bottom:30px;
+// -----------------------------
+// Mouse Reaction
+// -----------------------------
 
-    text-shadow:
-    0 0 30px rgba(125,215,255,.18);
+let mouseX = 0;
+let mouseY = 0;
 
-}
+window.addEventListener("mousemove",e=>{
 
-.hero-subtitle{
+mouseX = (e.clientX/window.innerWidth-.5)*2;
 
-    font-size:42px;
+mouseY = (e.clientY/window.innerHeight-.5)*2;
 
-    font-weight:700;
+});
 
-    margin-bottom:28px;
 
-}
 
-.hero-description{
+// -----------------------------
+// Hero Animation
+// -----------------------------
 
-    max-width:650px;
+const hero = document.querySelector(".hero-title");
 
-    color:#b6b6b6;
+hero.style.opacity = 0;
+hero.style.transform = "translateY(80px) scale(.92)";
 
-    font-size:23px;
+setTimeout(()=>{
 
-    line-height:1.8;
+hero.style.transition = "1.5s cubic-bezier(.2,.9,.2,1)";
 
-}
+hero.style.opacity = 1;
 
-.intro-panel h2{
+hero.style.transform = "translateY(0px) scale(1)";
 
-    font-size:78px;
+},400);
 
-    line-height:.95;
 
-    margin-bottom:35px;
 
-    letter-spacing:-2px;
+// -----------------------------
+// Main Loop
+// -----------------------------
 
-}
+function animate(){
 
-.intro-panel p{
+requestAnimationFrame(animate);
 
-    max-width:680px;
 
-    color:#a6a6a6;
 
-    font-size:24px;
+targetScroll += (slider.scrollLeft-targetScroll)*0;
 
-    line-height:1.8;
+slider.scrollLeft += (targetScroll-slider.scrollLeft)*.08;
 
-}
 
-.drag-hint{
 
-    display:inline-block;
+particles.rotation.y += .0004;
 
-    margin-top:70px;
+particles.rotation.x += (mouseY*.2-particles.rotation.x)*.02;
 
-    color:#666;
+particles.rotation.y += (mouseX*.2-particles.rotation.y)*.02;
 
-    letter-spacing:5px;
 
-    text-transform:uppercase;
 
-    font-size:14px;
+panels.forEach(panel=>{
 
-    animation:pulse 2s infinite;
+const rect = panel.getBoundingClientRect();
 
-}
+const center = window.innerWidth/2;
 
-@keyframes pulse{
+const panelCenter = rect.left + rect.width/2;
 
-0%{
+const distance = panelCenter-center;
 
-opacity:.25;
 
-transform:translateY(0px);
 
-}
+const move = distance*.06;
 
-50%{
+const scale = 1-Math.abs(distance)/5000;
 
-opacity:1;
+const opacity = Math.max(.15,1-Math.abs(distance)/700);
 
-transform:translateY(-6px);
 
-}
 
-100%{
+panel.style.transform = `translateX(${-move}px) scale(${scale})`;
 
-opacity:.25;
+panel.style.opacity = opacity;
 
-transform:translateY(0px);
+});
+
+
+
+renderer.render(scene,camera);
 
 }
 
-}
+animate();
 
-.enter-btn{
 
-display:inline-flex;
 
-align-items:center;
+// -----------------------------
 
-justify-content:center;
+window.addEventListener("resize",()=>{
 
-margin-top:60px;
+renderer.setSize(
 
-padding:22px 52px;
+window.innerWidth,
 
-border-radius:60px;
+window.innerHeight
 
-background:white;
+);
 
-color:black;
+camera.aspect =
 
-font-weight:800;
+window.innerWidth/window.innerHeight;
 
-font-size:18px;
+camera.updateProjectionMatrix();
 
-letter-spacing:2px;
-
-text-decoration:none;
-
-transition:.35s;
-
-box-shadow:
-
-0 0 35px rgba(255,255,255,.2);
-
-}
-
-.enter-btn:hover{
-
-transform:translateY(-6px) scale(1.04);
-
-background:#7dd7ff;
-
-box-shadow:
-
-0 0 50px rgba(125,215,255,.55);
-
-}
-
-.final-panel{
-
-padding-bottom:40px;
-
-}
+});
