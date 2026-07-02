@@ -147,15 +147,17 @@ const targetPositions = targets;
 
 const material = new THREE.PointsMaterial({
 
-color:0x7dd7ff,
+color:0x8fe7ff,
 
-size:0.04,
+size:0.06,
 
 transparent:true,
 
-opacity:.9,
+opacity:1,
 
-depthWrite:false
+depthWrite:false,
+
+blending:THREE.AdditiveBlending
 
 });
 
@@ -197,12 +199,18 @@ geometry.attributes.position.needsUpdate=true;
 
 let mouseX = 0;
 let mouseY = 0;
+let cameraTargetX = 0;
+let cameraTargetY = 0;
 
-window.addEventListener("mousemove",e=>{
+window.addEventListener("mousemove",(e)=>{
 
-mouseX = (e.clientX/window.innerWidth-.5)*2;
+mouseX=(e.clientX/window.innerWidth-.5)*2;
 
-mouseY = (e.clientY/window.innerHeight-.5)*2;
+mouseY=(e.clientY/window.innerHeight-.5)*2;
+
+cameraTargetX=mouseX*2.5;
+
+cameraTargetY=-mouseY*2;
 
 });
 
@@ -270,6 +278,13 @@ geometry.attributes.position.needsUpdate=true;
 
 }
 
+
+    camera.position.x += (cameraTargetX-camera.position.x)*0.03;
+
+camera.position.y += (cameraTargetY-camera.position.y)*0.03;
+
+camera.lookAt(scene.position);
+    
 particles.rotation.y += .0004;
 
 particles.rotation.x += (mouseY*.2-particles.rotation.x)*.02;
