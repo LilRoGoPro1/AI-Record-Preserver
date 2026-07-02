@@ -31,6 +31,18 @@ document.getElementById("sendChat").addEventListener("click", sendMessage);
 // Browse button
 
 document.getElementById("browseBtn").addEventListener("click", function () {
+    const fileInput = document.getElementById("fileInput");
+const selectedFile = document.getElementById("selectedFile");
+
+fileInput.addEventListener("change", () => {
+
+    if (fileInput.files.length > 0) {
+        selectedFile.textContent = fileInput.files[0].name;
+    } else {
+        selectedFile.textContent = "No file selected";
+    }
+
+});
     document.getElementById("fileInput").click();
 });
 
